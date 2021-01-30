@@ -2,7 +2,7 @@ from ast import literal_eval
 import numpy as np
 INCR = 10
 # edit to the name of the input file
-f = open('circlecovers5.txt', 'r')
+f = open('circlecovers6.txt', 'r')
 
 n = int(f.readline())
 points = [f.readline() for _ in range(n)]
@@ -35,7 +35,7 @@ for r in radii:
 
 
 # change to whatever you want your output file to be called
-out = open('output5.txt', 'w')
+out = open('output6.txt', 'w')
 
 for t in np.array(centers)[radii_indices]:
     out.write(str(t[0]) + ' '+ str(t[1]))

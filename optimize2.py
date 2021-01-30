@@ -1,8 +1,8 @@
 from ast import literal_eval
 import numpy as np
-INCR = 1
+INCR = 10
 # edit to the name of the input file
-f = open('circlecovers2.txt', 'r')
+f = open('circlecovers3.txt', 'r')
 
 n = int(f.readline())
 points = [f.readline() for _ in range(n)]
@@ -45,16 +45,16 @@ for r in radii:
     to_remove = None
     for x in np.arange(min_x-r,max_x+r,INCR):
         for y in np.arange(min_y-r,max_y+r,INCR):
-            count = 0
-            in_c = []
-            for p in active_points:
-                if inCircle([x,y],p,r):
-                    count += 1
-                    in_c.append(p)
-            if count > max_points:
-                max_points = count
-                best_center = [x,y]
-                to_remove = in_c.copy()
+        count = 0
+        in_c = []
+        for p in active_points:
+            if inCircle([x,y],p,r):
+                count += 1
+                in_c.append(p)
+        if count > max_points:
+            max_points = count
+            best_center = [x,y]
+            to_remove = in_c.copy()
     centers.append(best_center)
     new_p = [p for p in active_points if p not in to_remove]
     active_points = new_p.copy()
@@ -62,7 +62,7 @@ for r in radii:
 
 
 # change to whatever you want your output file to be called
-out = open('output2.txt', 'w')
+out = open('output3.txt', 'w')
 
 for t in np.array(centers)[radii_indices]:
     out.write(str(t[0]) + ' '+ str(t[1]))

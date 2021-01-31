@@ -1,8 +1,8 @@
 from ast import literal_eval
 import numpy as np
-INCR = 10
+INCR = 1
 # edit to the name of the input file
-f = open('circlecovers3.txt', 'r')
+f = open('circlecovers4.txt', 'r')
 
 n = int(f.readline())
 points = [f.readline() for _ in range(n)]
@@ -17,8 +17,8 @@ centers = []
 points = [i.strip().split(' ') for i in points]
 points = [[int(i[0]), int(i[1])] for i in points]
 radii = np.array([int(i) for i in radii])
-radii_indices = np.argsort(radii)[::-1]
-radii = np.sort(radii)[::-1]
+radii_indices = np.argsort(radii)
+radii = np.sort(radii)
 
 def inCircle(center,coords,r):
     return np.linalg.norm(np.array(coords)-np.array(center)) <= r
@@ -45,16 +45,16 @@ for r in radii:
     to_remove = None
     for x in np.arange(min_x-r,max_x+r,INCR):
         for y in np.arange(min_y-r,max_y+r,INCR):
-        count = 0
-        in_c = []
-        for p in active_points:
-            if inCircle([x,y],p,r):
-                count += 1
-                in_c.append(p)
-        if count > max_points:
-            max_points = count
-            best_center = [x,y]
-            to_remove = in_c.copy()
+            count = 0
+            in_c = []
+            for p in active_points:
+                if inCircle([x,y],p,r):
+                    count += 1
+                    in_c.append(p)
+            if count > max_points:
+                max_points = count
+                best_center = [x,y]
+                to_remove = in_c.copy()
     centers.append(best_center)
     new_p = [p for p in active_points if p not in to_remove]
     active_points = new_p.copy()
@@ -62,7 +62,7 @@ for r in radii:
 
 
 # change to whatever you want your output file to be called
-out = open('output3.txt', 'w')
+out = open('output24.txt', 'w')
 
 for t in np.array(centers)[radii_indices]:
     out.write(str(t[0]) + ' '+ str(t[1]))

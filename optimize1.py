@@ -1,18 +1,47 @@
+import numpy as np
 # edit to the name of the input file
-f = open('input.in', 'r')
+f = open('uniqueproducts1.txt', 'r')
 n,m = map(int, f.readline().strip().split())
 subsets = []
+def get_combos(primes,max):
+    maxes = [int(math.log(max,i)) for i in primes]
+    print(maxes)
+    nums = []
+    for i in range(len(primes)):
+        pows = [primes[i]**j for j in range(maxes[i]+1)]
+        nums+=pows
+    # print(nums)
+    new_nums = []
+    for i in range(len(nums)):
+        for j in range(i,len(nums)):
+            prod = nums[i]*nums[j]
+            if prod <= max:
+                new_nums.append(prod)
+    return set(new_nums)
+def primesfrom2to(n):
+    """ Input n>=6, Returns a array of primes, 2 <= p < n """
+    sieve = np.ones(n//3 + (n%6==2), dtype=np.bool)
+    for i in range(1,int(n**0.5)//3+1):
+        if sieve[i]:
+            k=3*i+1|1
+            sieve[       k*k//3     ::2*k] = False
+            sieve[k*(k-2*(i&1)+4)//3::2*k] = False
+    return np.r_[2,3,((3*np.nonzero(sieve)[0][1:]+1)|1)]
 # replace from here to line 10 with your own logic
 # variables available are just n and m, which are as described in the problem
-for _ in range(n):
-    # populate sets with lists of the sets you want
-
-    subsets.append([1,2])
+primes = primesfrom2to(m)
+print(primes)
+def get2k(primes,k):
+    for i,p in enumerate(primes):
+        try:
+            return [p]+get2k(primes[i+1:],k)
+for k in range(2,m//n):
+    pass
 print(subsets)
 assert len({len(i) for i in subsets}) == 1, "Subsets are not of equal size"
 
 # change to whatever you want your output file to be called
-out = open('output.txt', 'w')
+out = open('output1.txt', 'w')
 for s in subsets:
     for i in range(len(s)):
         out.write(str(s[i])+" ")

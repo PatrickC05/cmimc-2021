@@ -1,8 +1,8 @@
 from ast import literal_eval
 import numpy as np
-INCR = 0.5
+INCR = 2
 # edit to the name of the input file
-f = open('circlecovers1.txt', 'r')
+f = open('circlecovers3.txt', 'r')
 print(INCR)
 n = int(f.readline())
 points = [f.readline() for _ in range(n)]
@@ -64,7 +64,7 @@ for r in radii:
 
 
 # change to whatever you want your output file to be called
-out = open('output21.txt', 'w')
+out = open('output23.txt', 'w')
 
 for t in np.array(centers)[inverse]:
     out.write(str(t[0]) + ' '+ str(t[1]))

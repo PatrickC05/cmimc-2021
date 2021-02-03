@@ -1,11 +1,11 @@
 import numpy as np
+import math
 # edit to the name of the input file
-f = open('uniqueproducts1.txt', 'r')
+f = open('uniqueproducts4.txt', 'r')
 n,m = map(int, f.readline().strip().split())
 subsets = []
 def get_combos(primes,max):
     maxes = [int(math.log(max,i)) for i in primes]
-    print(maxes)
     nums = []
     for i in range(len(primes)):
         pows = [primes[i]**j for j in range(maxes[i]+1)]
@@ -29,19 +29,42 @@ def primesfrom2to(n):
     return np.r_[2,3,((3*np.nonzero(sieve)[0][1:]+1)|1)]
 # replace from here to line 10 with your own logic
 # variables available are just n and m, which are as described in the problem
-primes = primesfrom2to(m)
-print(primes)
-def get2k(primes,k):
-    for i,p in enumerate(primes):
+print(len(primes))
+def get2k(remain_primes,k, max, cur_in=[]):
+    combos = get_combos(cur_in,max)
+    if len(combos) > k:
+        raise ValueError()
+    if len(combos) == k:
+        return cur_in,remain_primes
+    for p in remain_primes:
+        new_remain = remain_primes.copy()
+        new_remain.remove(p)
+        new_in = cur_in.copy()
+        new_in.append(p)
         try:
-            return [p]+get2k(primes[i+1:],k)
-for k in range(2,m//n):
-    pass
+            return get2k(new_remain,k,max,new_in)
+        except ValueError:
+            pass
+for k in range(300,m//n):
+    active_primes = primesfrom2to(m).tolist()
+    cur_subsets = []
+    print(k)
+    try:
+        for i in range(n):
+            new_subset, active_primes = get2k(active_primes.copy(),k,m)
+            cur_subsets.append(list(get_combos(new_subset,m)))
+        subsets = cur_subsets.copy()
+        for s in subsets:
+            for i in range(len(s)):
+                print(str(s[i])+" ")
+        print("-----------")
+    except (ValueError, TypeError):
+        break
 print(subsets)
 assert len({len(i) for i in subsets}) == 1, "Subsets are not of equal size"
 
 # change to whatever you want your output file to be called
-out = open('output1.txt', 'w')
+out = open('output4.txt', 'w')
 for s in subsets:
     for i in range(len(s)):
         out.write(str(s[i])+" ")

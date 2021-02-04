@@ -2,8 +2,8 @@ from ast import literal_eval
 import numpy as np
 INCR = 1
 # edit to the name of the input file
-f = open('circlecovers3.txt', 'r')
 print(INCR)
+f = open('circlecovers3.txt', 'r')
 n = int(f.readline())
 points = [f.readline() for _ in range(n)]
 
@@ -28,13 +28,25 @@ def inCircle(center,coords,r):
 active_points = points.copy()
 
 def getCenters(point,r):
-    centers = []
     r2 = r**2
-    for x in range(-r,r+1):
-        for y in range(-r,r+1):
+    yield point
+    for i in np.arange(1,r+INCR,INCR):
+        yield i+point[0],point[1]
+        yield point[0]-i,point[1]
+        yield point[0],point[1]+i
+        yield point[0],point[1]-i
+    for x in np.arange(1,r+INCR,INCR):
+        for y in range(x,r+INCR,INCR):
             if x**2 + y**2 < r2:
-                centers.append((x,y))
-    return [(c[0]+point[0],c[1]+point[1]) for c in centers]
+                yield x+point[0],y+point[1]
+                yield point[0]-x,y+point[1]
+                yield point[0]+x,point[1]-y
+                yield point[0]-x,point[1]-y
+                if x!=y:
+                    yield y+point[0],x+point[1]
+                    yield point[0]-y,x+point[1]
+                    yield point[0]+y,point[1]-x
+                    yield point[0]-y,point[1]-x
 for r in radii:
     c_points = {}
     for p in active_points:
@@ -48,7 +60,7 @@ for r in radii:
     new_points = [p for p in active_points if p not in c_points[best_center]]
     active_points = new_points.copy()
     centers.append(best_center)
-    print(m-len(active_points))
+    print(n-len(active_points))
 
 # change to whatever you want your output file to be called
 out = open('output23.txt', 'w')

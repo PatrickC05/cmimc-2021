@@ -3,7 +3,7 @@ import numpy as np
 from dijkstar import Graph, find_path
 import random
 # edit to the name of the input file
-f = open('robotrecovery6.txt', 'r')
+f = open('robotrecovery2.txt', 'r')
 # change this function however you want: it takes in a character representing a cell
 # of the maze and x/y coordinates and returns whatever representation you want
 def rep(c,x,y):
@@ -78,7 +78,7 @@ def moveRobot(coords,move):
     return coords
 active_bots = robots.copy()
 while len(active_bots) > 0:
-    min_bot = np.argmax([np.absolute(r[0]-entrance[0])+np.absolute(r[1]-entrance[1]) for r in active_bots])
+    min_bot = np.argmin([(np.absolute(r[0]-entrance[0]))**2+(np.absolute(r[1]-entrance[1]))**2 for r in active_bots])
     new_instructions = find_path(graph,active_bots[min_bot],entrance,cost_func=cost_func).edges
     new_bots = []
     for r in active_bots:
@@ -96,7 +96,7 @@ while len(active_bots) > 0:
     print(len(active_bots))
 # change to whatever you want your output file to be called
 print(len(instructions))
-out = open('output36.txt', 'w')
+out = open('output32.txt', 'w')
 for i in instructions:
     out.write(i)
 out.close()

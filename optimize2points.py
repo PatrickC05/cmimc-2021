@@ -1,6 +1,6 @@
 from ast import literal_eval
 import numpy as np
-INCR = 1
+INCR = 0.5
 # edit to the name of the input file
 print(INCR)
 f = open('circlecovers3.txt', 'r')
@@ -36,7 +36,7 @@ def getCenters(point,r):
         yield point[0],point[1]+i
         yield point[0],point[1]-i
     for x in np.arange(1,r+INCR,INCR):
-        for y in range(x,r+INCR,INCR):
+        for y in np.arange(x,r+INCR,INCR):
             if x**2 + y**2 < r2:
                 yield x+point[0],y+point[1]
                 yield point[0]-x,y+point[1]

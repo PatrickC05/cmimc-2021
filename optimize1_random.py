@@ -1,7 +1,8 @@
 import numpy as np
 import math
+import random
 # edit to the name of the input file
-f = open('uniqueproducts1.txt', 'r')
+f = open('uniqueproducts4.txt', 'r')
 n,m = map(int, f.readline().strip().split())
 subsets = []
 def get_combos(primes,max):
@@ -29,40 +30,29 @@ def primesfrom2to(n):
     return np.r_[2,3,((3*np.nonzero(sieve)[0][1:]+1)|1)]
 # replace from here to line 10 with your own logic
 # variables available are just n and m, which are as described in the problem
-primes = primesfrom2to(m)
-print(primes)
-def get2k(remain_primes,k, max, cur_in=[]):
-    combos = get_combos(cur_in,max)
-    if len(combos) > k:
-        raise ValueError()
-    if len(combos) == k:
-        return cur_in,remain_primes
-    for p in remain_primes:
-        new_remain = remain_primes.copy()
-        new_remain.remove(p)
-        new_in = cur_in.copy()
-        new_in.append(p)
-        try:
-            return get2k(new_remain,k,max,new_in)
-        except:
-            pass
-for k in range(2,m//n):
-    active_primes = primesfrom2to(m).tolist()
-    cur_subsets = []
-    try:
-        for i in range(n):
-            new_subset, active_primes = get2k(active_primes.copy(),k,m)
-            cur_subsets.append(list(get_combos(new_subset,m)))
-
-        subsets = cur_subsets.copy()
-    except (ValueError, TypeError):
-        break
-    print(k)
-print(subsets)
+subsets=[[i for i in range(1,101)],[j for j in range(301,401)]]
 assert len({len(i) for i in subsets}) == 1, "Subsets are not of equal size"
-
+primes = primesfrom2to(m).tolist()
+num_primes = len(primes)
+best_m = 0
+for i in range(1000):
+    l1 = random.sample(primes, random.randint(10,num_primes//n))
+    l2 = [p for p in primes if p not in l1]
+    if n == 3:
+        l2_new = random.sample(l2,random.randint(10,num_primes//n))
+        l3 = [p for p in l2 if p not in l2_new]
+        l2 = l2_new.copy()
+    c1 = list(get_combos(l1,m))
+    c2 = list(get_combos(l2,m))
+    c3 = list(get_combos(l3,m))
+    ma = min(len(c1),len(c2),len(c3))
+    if ma > best_m:
+        subsets = [c1[:ma],c2[:ma],c3[:ma]]
+        best_m = ma
+        print(ma)
+print(len(subsets[0]),len(subsets[1]),subsets[2])
 # change to whatever you want your output file to be called
-out = open('output1.txt', 'w')
+out = open('output4.txt', 'w')
 for s in subsets:
     for i in range(len(s)):
         out.write(str(s[i])+" ")

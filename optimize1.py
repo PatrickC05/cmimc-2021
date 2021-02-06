@@ -1,7 +1,7 @@
 import numpy as np
 import math
 # edit to the name of the input file
-num = '6'
+num = '1'
 f = open('uniqueproducts'+num+'.txt', 'r')
 
 n,m = map(int, f.readline().strip().split())

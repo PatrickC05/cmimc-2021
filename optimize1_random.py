@@ -2,7 +2,7 @@ import numpy as np
 import math
 import random
 # edit to the name of the input file
-f = open('uniqueproducts4.txt', 'r')
+f = open('uniqueproducts1.txt', 'r')
 n,m = map(int, f.readline().strip().split())
 subsets = []
 def get_combos(primes,max):
@@ -35,7 +35,7 @@ assert len({len(i) for i in subsets}) == 1, "Subsets are not of equal size"
 primes = primesfrom2to(m).tolist()
 num_primes = len(primes)
 best_m = 0
-for i in range(1000):
+for i in range(1000000):
     l1 = random.sample(primes, random.randint(10,num_primes//n))
     l2 = [p for p in primes if p not in l1]
     if n == 3:
@@ -44,15 +44,15 @@ for i in range(1000):
         l2 = l2_new.copy()
     c1 = list(get_combos(l1,m))
     c2 = list(get_combos(l2,m))
-    c3 = list(get_combos(l3,m))
-    ma = min(len(c1),len(c2),len(c3))
+    # c3 = list(get_combos(l3,m))
+    ma = min(len(c1),len(c2))
     if ma > best_m:
-        subsets = [c1[:ma],c2[:ma],c3[:ma]]
+        subsets = [c1[:ma],c2[:ma]]
         best_m = ma
         print(ma)
-print(len(subsets[0]),len(subsets[1]),subsets[2])
+print(len(subsets[0]),len(subsets[1]))
 # change to whatever you want your output file to be called
-out = open('output4.txt', 'w')
+out = open('output1.txt', 'w')
 for s in subsets:
     for i in range(len(s)):
         out.write(str(s[i])+" ")

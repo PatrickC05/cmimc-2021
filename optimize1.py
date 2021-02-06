@@ -1,7 +1,9 @@
 import numpy as np
 import math
 # edit to the name of the input file
-f = open('uniqueproducts1.txt', 'r')
+num = '6'
+f = open('uniqueproducts'+num+'.txt', 'r')
+
 n,m = map(int, f.readline().strip().split())
 subsets = []
 def get_combos(primes,max):
@@ -46,25 +48,67 @@ def get2k(remain_primes,k, max, cur_in=[]):
             return get2k(new_remain,k,max,new_in)
         except:
             pass
-for k in range(2,m//n):
-    active_primes = primesfrom2to(m).tolist()
-    cur_subsets = []
-    try:
-        for i in range(n):
-            new_subset, active_primes = get2k(active_primes.copy(),k,m)
-            cur_subsets.append(list(get_combos(new_subset,m)))
 
+def shuffleList(primes,k):
+    yield primes
+    for i in range(len(primes)//n):
+        primes = primes[1:]+[primes[0]]
+        yield primes
+        yield primes[::-1]
+
+def works(k):
+    active_ps = primesfrom2to(m).tolist()
+    k_works = False
+    for active_primes in shuffleList(active_ps,k):
+        cur_subsets = []
+        failed = False
+        for i in range(n):
+            returns = get2k(active_primes.copy(),k,m)
+            if returns:
+                new_subset, active_primes = returns
+                cur_subsets.append(list(get_combos(new_subset,m)))
+            else:
+                failed = True
+                break
+        if not failed:
+            k_works = True
+            break
+    if k_works:
         subsets = cur_subsets.copy()
-    except (ValueError, TypeError):
-        break
-    print(k)
+        print(k)
+        return subsets
+    else:
+        print(str(k)+" doesn't work")
+        return False
+
+low = 1
+high = m//n
+mid = 0
+while low < high:
+    mid = (high+low)//2
+    print("Trying "+str(mid))
+    x = works(mid)
+    if x:
+        subsets = x
+        out = open('output'+num+'.txt', 'w')
+        print('here')
+        for s in subsets:
+            for i in range(len(s)):
+                out.write(str(s[i])+" ")
+            out.write("\n")
+        out.close()
+        low = mid + 1
+    else:
+        high = mid -1
+
+
 print(subsets)
 assert len({len(i) for i in subsets}) == 1, "Subsets are not of equal size"
 
 # change to whatever you want your output file to be called
-out = open('output1.txt', 'w')
-for s in subsets:
-    for i in range(len(s)):
-        out.write(str(s[i])+" ")
-    out.write("\n")
-out.close()
+# out = open('output1.txt')
+# for s in subsets:
+#     for i in range(len(s)):
+#         out.write(str(s[i])+" ")
+#     out.write("\n")
+# out.close()

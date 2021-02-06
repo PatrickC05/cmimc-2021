@@ -52,14 +52,15 @@ for r in radii:
     for p in active_points:
         for c in getCenters(p,r):
             try:
-                c_points[c].append(p)
+                c_points[c] +=1
             except KeyError:
-                c_points[c] = [p]
-    best_center = max(c_points, key=lambda k: len(c_points[k]))
+                c_points[c] = 1
+    best_center = max(c_points, key=lambda k: c_points[k])
     # print(c_points)
-    new_points = [p for p in active_points if p not in c_points[best_center]]
+    new_points = [p for p in active_points if not inCircle(best_center,p,r)]
     active_points = new_points.copy()
     centers.append(best_center)
+    print(best_center)
     print(n-len(active_points))
 
 # change to whatever you want your output file to be called

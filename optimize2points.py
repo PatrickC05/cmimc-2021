@@ -49,7 +49,7 @@ def getCenters(point,r):
                     yield point[0]-y,point[1]-x
 for r in radii:
     c_points = {}
-    for p in active_points[::5]:
+    for p in active_points:
         for c in getCenters(p,r):
             try:
                 c_points[c] +=1

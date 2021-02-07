@@ -57,27 +57,51 @@ def safeFromSun(x,y,move):
 class spaceship_bot:
 
     def __init__(self):
-        crashable = []
-        # ds = [-2,-1,1,2]
-        # for x1 in ds:
-        #     for x2 in ds:
-        #         for y1 in ds:
-        #             for y2 in ds:
-        #                 crashable.append((x1+x2,y1+y2))
-        # self.canCrash=set(crashable)
-        # self.ds = ds
-        # You can define global states (that last between moves) here
-        self.moves = [(1,2), (2,1), (2,-1), (1,-2),
-                      (-1,-2), (-2,-1), (-2,1), (-1,2)]
-        self.possible = {-1: [(2, -1), (1, -2), (-2, 1), (-1, 2)], 1: [(1, 2), (2, 1), (-1, -2), (-2, -1)]}
-        print(self.possible)
-    def move(self, ship, others):
-        possible = [move for move in self.possible[ship[2]] if safeFromSun(ship[0],ship[1],move)]
-        if possible:
-            
-            return random.choice(possible)
-        return random.choice(self.possible[-ship[2]])
 
+        # You can define global states (that last between moves) here
+        self.moves = [(1,2), (2,1), (2,-1), (1,-2), (-1,-2), (-2,-1), (-2,1), (-1,2)]
+
+    def manDist(self,x, y):
+        return abs(x) + abs(y)
+
+    def addedAngle(self,x,y,newx,newy):
+        old_angle = math.atan2(y,x)
+        new_angle = math.atan2(newy,newx)
+        if old_angle > math.pi/2 and new_angle<-math.pi/2:
+            return (2*math.pi + new_angle - old_angle)*self.status
+        elif new_angle > math.pi/2 and old_angle < -math.pi/2:
+            return (new_angle-old_angle-2*math.pi)*self.status
+        else:
+            return (new_angle-old_angle)*self.status
+
+    def precomputeCrashable(self,others):
+        crashable = []
+        for other_x, other_y, status, _ in others:
+            if status != 0:
+                for i in range(8):
+                    crashable.append((other_x + self.moves[i][0], other_y + self.moves[i][1]))
+        self.canCrash = set(crashable)
+
+    def willCrash(self,x, y):
+        if min(abs(x),abs(y)) < 3:
+            return True
+        return (x,y) in self.canCrash
+
+    def move(self, ship, others):
+        x, y, self.status, score = ship
+        if self.manDist(x, y)>7:
+            move_dict = {(x+m[0],y+m[1]): self.manDist(x+m[0],y+m[1]) for m in self.moves}
+            sorted_locs = [loc for loc, dist in sorted(move_dict.items(),key=lambda k: k[1])]
+        else:
+            move_dict = {(x+m[0],y+m[1]): self.addedAngle(x, y, x+m[0],y+m[1]) for m in self.moves}
+            sorted_locs = [loc for loc, dist in sorted(move_dict.items(),key=lambda k: -k[1])]
+
+        self.precomputeCrashable(others)
+
+        for new_x,new_y in sorted_locs:
+            if not self.willCrash(new_x,new_y):
+                return new_x-x, new_y-y
+        return sorted_locs[0][0]-x, sorted_locs[0][1]-y
 
 #=============================================================================
 
@@ -86,7 +110,7 @@ class spaceship_bot:
 # If you would like to view a turn by turn game display while testing locally,
 # set this parameter to True
 
-LOCAL_VIEW = False
+LOCAL_VIEW = True
 
 # Set the size of the area (around the origin) you would like to display, as a
 # square of side length 2 * SIDE + 1

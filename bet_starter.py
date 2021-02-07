@@ -41,42 +41,42 @@
 # Example bot that plays a random card every round:
 
 import random
-import math
 
 class bet_bot:
 
     def __init__(self):
         self.remaining = list(range(2,15))
-        pass
+
 
     def move(self, hand, others, card, scores):
         if len(hand) == 1:
+            self.remaining = list(range(2,15))
             return hand[0]
         guarantees = 0
         for i in hand[::-1]:
-            if i > max(max(others[0]),max(others[1])):
+            if i > max(others[0][-1],others[1][-1]):
                 guarantees += 1
             else:
                 break
         if guarantees > 0:
             if card in self.remaining[-guarantees:]:
                 self.remaining.remove(card)
-                return max(hand)
+                return hand[-1]
         guarantees = 0
         for i in hand:
-            if i < max(min(others[0]),min(others[1])):
+            if i < max(others[0][0],others[1][0]):
                 guarantees += 1
             else:
                 break
         if guarantees > 0:
             if card in self.remaining[:guarantees]:
                 self.remaining.remove(card)
-                return min(hand)
+                return hand[0]
         self.remaining.remove(card)
-        if card in hand:
-            return card
-
-        return random.choice(hand)
+        diffs=[abs(i-card) for i in hand]
+        total = sum(diffs)
+        randoml = random.choices(hand,weights=[total-d for d in diffs])
+        return randoml[0]
 
 #=============================================================================
 

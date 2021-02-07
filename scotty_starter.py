@@ -57,11 +57,11 @@
 
 
 # Example Scotty bot that makes a random move:
-
+import random
 class scotty_bot:
-    
+
     def __init__(self):
-        # You can define global states (that last between moves) here
+        self.visited = []
         pass
 
     def find_scotty(self, board):
@@ -70,18 +70,35 @@ class scotty_bot:
             for x in range(15):
                 if board[y][x] == 1:
                     return (x, y)
-    
+
     def move(self, board):
         # You should write your code that moves every turn here
         moves = [(-1, -1), (-1, 0), (-1, 1), (0, 1),
                  (1, 1), (1, 0), (1, -1), (0, -1)]
         x, y = self.find_scotty(board)
-        while moves:
-            dx, dy = moves.pop(random.randrange(len(moves)))
-            if max(x + dx, y + dy) >= 15 or min(x + dx, y + dy) < 0:
-                return (dx, dy)
-            elif board[y + dy][x + dx] == 0:
-                return (dx, dy)
+        self.visited.append((x,y))
+        if x >= 7:
+            if y >= 7:
+                moves = [(1,1),(1,0),(0,1),(1,-1),(-1,1),(-1,0),(0,-1),(-1,-1)]
+            else:
+                moves = [(1,-1),(1,0),(0,-1),(1,1),(-1,-1),(-1,0),(0,1),(-1,1)]
+        else:
+            if y >= 7:
+                moves = [(-1,1),(0,1),(-1,0),(-1,-1),(1,1),(0,-1),(1,0),(1,-1)]
+            else:
+                moves = [(-1,-1),(0,-1),(-1,0),(-1,1),(1,-1),(0,1),(1,0),(1,1)]
+        repeat = []
+        for dx,dy in moves:
+            new_loc = x+dx,y+dy
+            if max(new_loc) >=15 or min(new_loc) <0:
+                return dx,dy
+            if board[new_loc[1]][new_loc[0]] == 0:
+                if new_loc in self.visited:
+                    repeat.append((dx,dy))
+                else:
+                    return (dx, dy)
+        if repeat:
+            return repeat[0]
         return (0, 0)
 
 # Example trapper bot that places a barrier randomly:
@@ -91,15 +108,25 @@ class trapper_bot:
     def __init__(self):
         # You can define global states (that last between moves) here
         pass
-    
+    def find_scotty(self, board):
+        # Helper function that finds Scotty's location on the board
+        for y in range(15):
+            for x in range(15):
+                if board[y][x] == 1:
+                    return (x, y)
     def move(self, board):
         # You should write your code that moves every turn here
-        moves = [(x, y) for x in range(15) for y in range(15)]
-        while moves:
-            x, y = moves.pop(random.randrange(len(moves)))
-            if board[y][x] == 0:
-                return (x, y)
-        return (0, 0)
+        moves = [(x, y) for x in range(15) for y in range(15) if board[y][x]==0]
+        # while moves:
+        #     x, y = moves.pop(random.randrange(len(moves)))
+        #     if board[y][x] == 0:
+        #         return (x, y)
+        for i in range(8):
+            for x,y in moves:
+                if (x==i or x==14-i) or (y==i or y == 14-i):
+                    return x,y
+        return random.choice(moves)
+
 
 
 #=============================================================================

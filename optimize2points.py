@@ -3,7 +3,7 @@ import numpy as np
 INCR = 1
 # edit to the name of the input file
 print(INCR)
-f = open('circlecovers5.txt', 'r')
+f = open('circlecovers4.txt', 'r')
 n = int(f.readline())
 points = [f.readline() for _ in range(n)]
 
@@ -49,7 +49,7 @@ def getCenters(point,r):
                     yield point[0]-y,point[1]-x
 for r in radii:
     c_points = {}
-    for p in active_points[::10]:
+    for p in active_points[::5]:
         for c in getCenters(p,r):
             try:
                 c_points[c] +=1
@@ -64,7 +64,7 @@ for r in radii:
     print(n-len(active_points))
 
 # change to whatever you want your output file to be called
-out = open('output25.txt', 'w')
+out = open('output24.txt', 'w')
 
 for t in np.array(centers)[inverse]:
     out.write(str(t[0]) + ' '+ str(t[1]))

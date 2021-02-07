@@ -57,6 +57,7 @@
 
 
 # Example Scotty bot that makes a random move:
+from collections import deque
 import random
 class scotty_bot:
 
@@ -66,40 +67,78 @@ class scotty_bot:
 
     def find_scotty(self, board):
         # Helper function that finds Scotty's location on the board
-        for y in range(15):
-            for x in range(15):
-                if board[y][x] == 1:
-                    return (x, y)
+        for r in range(15):
+            for c in range(15):
+                if board[r][c] == 1:
+                    return (r, c)
 
     def move(self, board):
         # You should write your code that moves every turn here
-        moves = [(-1, -1), (-1, 0), (-1, 1), (0, 1),
-                 (1, 1), (1, 0), (1, -1), (0, -1)]
-        x, y = self.find_scotty(board)
-        self.visited.append((x,y))
-        if x >= 7:
-            if y >= 7:
-                moves = [(1,1),(1,0),(0,1),(1,-1),(-1,1),(-1,0),(0,-1),(-1,-1)]
+        moves = [(-1, 0), (0, 1), (1, 0), (0, -1), (1,-1), (-1, -1), (-1, 1), (1, 1)]
+
+        r,c = self.find_scotty(board)
+        if r == 0:
+            return [0,-1]
+        elif r == 14:
+            return [0,1]
+        elif c == 0:
+            return [-1,0]
+        elif c == 14:
+            return [1,0]
+
+        dists = [[100000 for i in range(15)] for j in range(15)]
+        par = [[100000 for i in range(15)] for j in range(15)]
+        queue = deque([(r, c)])
+        dists[r][c] = 0
+
+        while queue:
+            cur = queue.popleft()
+
+            for i in range(8):
+                nr = cur[0] + moves[i][0]
+                nc = cur[1] + moves[i][1]
+
+                if nr<0 or nc < 0:
+                    continue
+                if nr > 14 or nc > 14:
+                    continue
+                if board[nr][nc]!=0:
+                    continue
+                if dists[nr][nc]!=100000:
+                    continue
+                dists[nr][nc]=dists[cur[0]][cur[1]]+1
+                par[nr][nc] = [cur[0], cur[1]]
+                queue.append((nr, nc))
+
+        # assert dists[0][0]!=100000
+        bestDist = 100000
+        exit = [0,0]
+
+        for i in range(15):
+            if dists[0][i]<bestDist:
+                exit = [0, i]
+                bestDist = dists[0][i]
+            if dists[14][i]<bestDist:
+                exit = [14, i]
+                bestDist = dists[14][i]
+            if dists[i][0]<bestDist:
+                exit = [i, 0]
+                bestDist = dists[i][0]
+            if dists[i][14]<bestDist:
+                exit = [i, 14]
+                bestDist = dists[i][14]
+
+        if bestDist==100000:
+            return 0, 0
+
+        while True:
+            nr, nc = par[exit[0]][exit[1]]
+            if nr==r and nc==c:
+                break
             else:
-                moves = [(1,-1),(1,0),(0,-1),(1,1),(-1,-1),(-1,0),(0,1),(-1,1)]
-        else:
-            if y >= 7:
-                moves = [(-1,1),(0,1),(-1,0),(-1,-1),(1,1),(0,-1),(1,0),(1,-1)]
-            else:
-                moves = [(-1,-1),(0,-1),(-1,0),(-1,1),(1,-1),(0,1),(1,0),(1,1)]
-        repeat = []
-        for dx,dy in moves:
-            new_loc = x+dx,y+dy
-            if max(new_loc) >=15 or min(new_loc) <0:
-                return dx,dy
-            if board[new_loc[1]][new_loc[0]] == 0:
-                if new_loc in self.visited:
-                    repeat.append((dx,dy))
-                else:
-                    return (dx, dy)
-        if repeat:
-            return repeat[0]
-        return (0, 0)
+                exit = [nr, nc]
+        return [exit[1]-c,exit[0]-r]
+        # return [1, 1]
 
 # Example trapper bot that places a barrier randomly:
 
@@ -114,18 +153,20 @@ class trapper_bot:
             for x in range(15):
                 if board[y][x] == 1:
                     return (x, y)
+
     def move(self, board):
-        # You should write your code that moves every turn here
-        moves = [(x, y) for x in range(15) for y in range(15) if board[y][x]==0]
-        # while moves:
-        #     x, y = moves.pop(random.randrange(len(moves)))
-        #     if board[y][x] == 0:
-        #         return (x, y)
-        for i in range(8):
-            for x,y in moves:
-                if (x==i or x==14-i) or (y==i or y == 14-i):
-                    return x,y
-        return random.choice(moves)
+        tmp = scotty_bot()
+        move = tmp.move(board)
+        pos = self.find_scotty(board)
+        if move==(0,0):
+            moves = [(-1, 0), (0, 1), (1, 0), (0, -1), (1,-1), (-1, -1), (-1, 1), (1, 1)]
+            for i in range(8):
+                nx = pos[0] + moves[i][0]
+                ny = pos[1] + moves[i][1]
+                if board[ny][nx]==0:
+                    return nx, ny
+        else:
+            return pos[0] + move[0], pos[1] + move[1]
 
 
 
@@ -136,7 +177,7 @@ class trapper_bot:
 # If you would like to view a turn by turn game display while testing locally,
 # set this parameter to True
 
-LOCAL_VIEW = False
+LOCAL_VIEW = True
 
 # Sample board your game will be run on (flipped vertically)
 # This file will display 0 as ' ', 1 as '*', 2 as 'X', and 3 as 'O'
